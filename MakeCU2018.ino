@@ -10,7 +10,7 @@ int temp_pin = A0;
 int hall_pin = A2;
 int vol_readpin = A4;
 int vol_pin = 4; //starting from the highest range
-int gain = 1;
+int gain = 11;
 
 
 String botName = "PocketSensy";
@@ -74,9 +74,9 @@ void set_range(int pin)
     pinMode(pin, OUTPUT);
     digitalWrite(pin, LOW);
   }
-  if (pin == 4) {gain = 101;}
+  /*if (pin == 4) {gain = 101;}
   if (pin == 3) {gain = 11;}
-  if (pin == 2) {gain = 2;}
+  if (pin == 2) {gain = 2;}*/
 }
 
 float process_vol()
@@ -87,7 +87,7 @@ float process_vol()
    input_voltage = (analog_value * 5.0) / 1024.0; 
    vol_read = input_voltage * gain;
 
-   if (input_voltage < 0.9)
+   /*if (input_voltage < 0.9)
    {
     vol_pin = vol_pin - 1;
     set_range(vol_pin);
@@ -97,7 +97,7 @@ float process_vol()
     vol_pin = vol_pin + 1;
     set_range(vol_pin);
    }
-
+  */
     Serial.println(analog_value);
     Serial.println(input_voltage);
     return vol_read;
@@ -198,18 +198,19 @@ BLYNK_READ(V10)
 
 BLYNK_READ(V15)
 {
-  Blynk.virtualWrite(15, x_accl + 50); 
+  Blynk.virtualWrite(15, x_accl*100 + 50); 
 }
 
 BLYNK_READ(V16)
 {
-  Blynk.virtualWrite(16, y_accl + 50); 
+  Blynk.virtualWrite(16, y_accl*100 + 50); 
 }
 
 void handleSensors() {
   Serial.print("Voltage: ");
   //Serial.print(process_vol(), 2);
-  voltage = process_vol();
+  voltage = (process_vol() - 0.65)*(1.5/2.0);
+  voltage = voltage - (voltage)*(voltage)*0.00934;
   Serial.println("V ");
   Serial.print ("Field Intensity: ");
   //Serial.print(process_hall());
@@ -217,7 +218,7 @@ void handleSensors() {
   Serial.println("mT ");
   Serial.print ("Temperature: ");
   //Serial.print (process_temp(), 2); 
-  temp = process_temp();
+  temp = process_temp()/2.0;
   Serial.println ("℃ ");
   process_accl();
   Blynk.virtualWrite(10, hall_effect);
