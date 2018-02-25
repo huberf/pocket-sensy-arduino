@@ -6,9 +6,9 @@
 #include <math.h>
 #include <CurieIMU.h>
 /* PINS */
-int temp_pin = A1;
+int temp_pin = A0;
 int hall_pin = A2;
-int vol_readpin = A0;
+int vol_readpin = A4;
 int vol_pin = 4; //starting from the highest range
 int gain = 1;
 
@@ -150,9 +150,11 @@ void process_accl() {
   // display tab-separated accelerometer x/y/z values
   Serial.print("a:\t");
   Serial.print(ax);
+  Blynk.virtualWrite(15, ax*100 + 50); 
   
   Serial.print("\t");
   Serial.print(ay);
+  Blynk.virtualWrite(16, ay*100 + 50); 
   Serial.print("\t");
   Serial.print(az);
   Serial.println();
@@ -218,4 +220,8 @@ void handleSensors() {
   temp = process_temp();
   Serial.println ("℃ ");
   process_accl();
+  Blynk.virtualWrite(10, hall_effect);
+  Blynk.virtualWrite(9, temp);
+  Blynk.virtualWrite(20, temp);
+  Blynk.virtualWrite(8, voltage);
 }
